@@ -4,7 +4,7 @@ import pickle
 from PIL import Image
 import numpy as np
 from keras.models import load_model, Model
-from keras.applications.vgg16 import preprocess_input
+from keras.applications.mobilenet_v2 import preprocess_input
 from sklearn.svm import SVC
 from keras import backend as K
 
@@ -19,14 +19,14 @@ def sensitivity(y_true, y_pred):
     return true_positives / (possible_positives + K.epsilon())
 
 # Load the SVM model
-model_svm_rbf_path = r"D:\Users\RESA\Coding\Evaluasi\VGG16_svm_model_rbf.pkl"
+model_svm_rbf_path = r"D:\Users\RESA\Coding\Model\mobilenetv2_svm_model_rbf.pkl"
 model_svm_rbf = pickle.load(open(model_svm_rbf_path, 'rb'))
 
-# Load the pre-trained VGG16 model with custom objects
-model_path = r"D:\Users\RESA\Coding\Evaluasi\VGG16.h5"
+# Load the pre-trained MobileNetV2 model with custom objects
+model_path = r"D:\Users\RESA\Coding\Model\M_MobileNetV2.h5"
 loaded_model = load_model(model_path, custom_objects={'specificity': specificity, 'sensitivity': sensitivity})
 
-# Extract features from the last layer of VGG16
+# Extract features from the last layer of MobileNetV2
 extractCNN = Model(loaded_model.inputs, loaded_model.layers[-2].output)
 
 # Define class mapping
@@ -37,7 +37,7 @@ class_mapping = {
     3: 'AD'
 }
 
-# Function to preprocess the image for VGG16 model
+# Function to preprocess the image for MobileNetV2 model
 def preprocess_image(img_path):
     img = Image.open(img_path).convert('RGB')
     img_array = np.array(img)
@@ -45,19 +45,19 @@ def preprocess_image(img_path):
     img_array = preprocess_input(img_array)
     return img_array
 
-# Function to extract VGG16 features
-def extract_vgg16_features(img_array):
+# Function to extract MobileNetV2 features
+def extract_mobilenetv2_features(img_array):
     features = extractCNN.predict(img_array)
     features = features.flatten()
     return features
 
 # Function to perform classification with class mapping
 def classify_image(img_array):
-    # Extract VGG16 features
-    vgg16_features = extract_vgg16_features(img_array)
+    # Extract MobileNetV2 features
+    mobilenetv2_features = extract_mobilenetv2_features(img_array)
 
     # Make prediction using the SVM model
-    prediction_index = model_svm_rbf.predict(vgg16_features.reshape(1, -1))[0]
+    prediction_index = model_svm_rbf.predict(mobilenetv2_features.reshape(1, -1))[0]
     
     # Map the predicted index to the corresponding class label
     predicted_class = class_mapping.get(prediction_index, "Unknown")
@@ -65,7 +65,7 @@ def classify_image(img_array):
 
 # Streamlit app
 def app():
-    st.title("Image Classification with VGG16 and SVM")
+    st.title("Image Classification with CNN MobileNetV2")
 
     # Upload image directly in the main area
     uploaded_file = st.file_uploader("Choose an image...", type="png")

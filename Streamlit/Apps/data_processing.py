@@ -9,7 +9,7 @@ import cv2
 import pandas as pd
 import pickle
 
-model_svm_rbf = r"D:/Users/RESA/Coding/Evaluasi/VGG16_svm_model_rbf.pkl"
+model_svm_rbf = r"D:/Users/RESA/Coding/Model/mobilenetv2_svm_model_rbf.pkl"
 with open(model_svm_rbf, 'rb') as model_file:
     svm_rbf = pickle.load(model_file)
 
@@ -197,7 +197,7 @@ def app():
 
                 st.pyplot(fig)
 
-                output_directory = "D:/Users/RESA/Coding/Evaluasi/Processed_Data/"
+                output_directory = "D:/Users/RESA/Coding/Model/Processed_Data/"
                 file_name = uploaded_file.name.split(".")[0]
 
                 # Simpan citra yang sudah diresize
